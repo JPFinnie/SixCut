@@ -1,5 +1,13 @@
 import { createClient } from "@supabase/supabase-js";
 
+/** True when Supabase env vars are configured (guards builds without creds). */
+export function hasSupabaseEnv(): boolean {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
+}
+
 /**
  * Anon-key client for server-side reads (RLS-protected).
  * No auth/session handling needed — this app has no user auth (PLAN.md §10).
