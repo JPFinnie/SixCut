@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import Map, { Marker, NavigationControl } from "react-map-gl/mapbox";
 import type { ButcherSummary } from "@/lib/types";
 import { isOpenNow } from "@/lib/hours";
@@ -15,7 +15,22 @@ const TAG_ZOOM = 12.5;
 
 export function MapExplorer({ butchers }: { butchers: ButcherSummary[] }) {
   const { selectedId, filters, select } = useMapStore();
-  const [compact, setCompact] = useState(TORONTO.zoom < TAG_ZOOM);
+
+  // Compact-pin mode is toggled via a data attribute + CSS (see globals.css),
+  // NOT React state: onMove fires every frame during a zoom gesture, and a
+  // state flip there re-rendered all 124 markers mid-gesture (visible jank).
+  const rootRef = useRef<HTMLDivElement>(null);
+  const compactRef = useRef(TORONTO.zoom < TAG_ZOOM);
+  useEffect(() => {
+    rootRef.current?.setAttribute("data-compact", String(compactRef.current));
+  }, []);
+  const onMove = (zoom: number) => {
+    const compact = zoom < TAG_ZOOM;
+    if (compact !== compactRef.current) {
+      compactRef.current = compact;
+      rootRef.current?.setAttribute("data-compact", String(compact));
+    }
+  };
 
   const visible = useMemo(() => {
     const q = filters.q.trim().toLowerCase();
@@ -31,14 +46,14 @@ export function MapExplorer({ butchers }: { butchers: ButcherSummary[] }) {
   const selected = visible.find((b) => b.id === selectedId) ?? null;
 
   return (
-    <div className="relative flex-1 min-h-0">
+    <div ref={rootRef} className="map-root relative flex-1 min-h-0">
       <Map
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         initialViewState={TORONTO}
         mapStyle="mapbox://styles/mapbox/dark-v11"
         style={{ position: "absolute", inset: 0 }}
         onClick={() => select(null)}
-        onMove={(e) => setCompact(e.viewState.zoom < TAG_ZOOM)}
+        onMove={(e) => onMove(e.viewState.zoom)}
       >
         <NavigationControl position="bottom-right" showCompass={false} />
         {visible.map(
@@ -59,7 +74,6 @@ export function MapExplorer({ butchers }: { butchers: ButcherSummary[] }) {
                   selected={b.id === selectedId}
                   score={b.six_cut_score}
                   name={b.name}
-                  compact={compact}
                 />
               </Marker>
             ),

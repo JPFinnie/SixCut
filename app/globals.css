@@ -98,3 +98,11 @@ body::after {
   background: var(--line);
   border-radius: 3px;
 }
+
+/* ── Zoom-adaptive pins ───────────────────────────────────────────────
+   Both variants are always in the DOM; a single data attribute on the
+   map root decides which shows. Toggled via direct DOM (no React state,
+   no re-render of 124 markers mid-gesture) and with no morph animation. */
+.pin-dot { display: none; }
+.map-root[data-compact="true"] .pin[data-sel="false"] .pin-dot { display: grid; }
+.map-root[data-compact="true"] .pin[data-sel="false"] .pin-tag { display: none; }
