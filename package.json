@@ -9,7 +9,9 @@
     "lint": "eslint",
     "seed": "tsx scripts/seed.ts",
     "seed:photos": "tsx scripts/seed-photos.ts",
-    "discover": "tsx scripts/discover.ts"
+    "discover": "tsx scripts/discover.ts",
+    "score": "tsx scripts/score.ts",
+    "cleanup": "tsx scripts/cleanup.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

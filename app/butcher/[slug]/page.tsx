@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import { hasSupabaseEnv, supabaseServer } from "@/lib/supabase/server";
 import type { Butcher, Media } from "@/lib/types";
 import { isOpenNow, todayHoursLine } from "@/lib/hours";
-import { StarRating } from "@/components/ui/StarRating";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { ScoreDuo } from "@/components/ui/ScoreDuo";
+import { ScoreBreakdownBars } from "@/components/detail/ScoreBreakdownBars";
 import { CleaverLogo } from "@/components/ui/CleaverLogo";
 import { InteriorViewer } from "@/components/detail/InteriorViewer";
 import { ReviewList } from "@/components/detail/ReviewList";
@@ -78,7 +78,7 @@ export default async function ButcherPage({
         >
           ← Back to the map
         </Link>
-        <ThemeToggle />
+        <CleaverLogo size={26} className="text-oxblood" />
       </nav>
 
       <header className="rise-in relative flex flex-col gap-3" style={{ animationDelay: "60ms" }}>
@@ -91,21 +91,25 @@ export default async function ButcherPage({
           <h1 className="font-display font-black tracking-tight leading-[0.98] text-[clamp(2.2rem,6vw,3.4rem)]">
             {butcher.name}
           </h1>
-          {butcher.google_rating != null && (
+          {butcher.six_cut_score != null && (
             <div className="stamp hidden sm:flex flex-col items-center px-3.5 py-2 shrink-0 mt-2 select-none">
               <span className="font-display font-black text-2xl leading-none">
-                {butcher.google_rating.toFixed(1)}
+                {butcher.six_cut_score.toFixed(1)}
               </span>
-              <span className="text-[9px] font-bold uppercase">Six Cut grade</span>
+              <span className="text-[9px] font-bold uppercase">Six Cut Score</span>
             </div>
           )}
         </div>
 
-        <StarRating
-          rating={butcher.google_rating}
-          count={butcher.google_review_count}
-          className="text-lg"
+        <ScoreDuo
+          sixCutScore={butcher.six_cut_score}
+          googleRating={butcher.google_rating}
+          googleCount={butcher.google_review_count}
         />
+
+        {butcher.six_cut_breakdown && (
+          <ScoreBreakdownBars breakdown={butcher.six_cut_breakdown} />
+        )}
 
         <div className="text-sm text-muted flex flex-col gap-0.5">
           {butcher.address && <p>{butcher.address}</p>}

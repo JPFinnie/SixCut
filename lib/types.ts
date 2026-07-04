@@ -7,6 +7,8 @@ export type Specialty =
   | "charcuterie"
   | "custom_cuts";
 
+import type { ScoreBreakdown } from "@/lib/scoring";
+
 export interface Butcher {
   id: string;
   slug: string;
@@ -22,6 +24,8 @@ export interface Butcher {
   google_place_id: string | null;
   google_rating: number | null;
   google_review_count: number | null;
+  six_cut_score: number | null;
+  six_cut_breakdown: ScoreBreakdown | null;
   is_published: boolean;
 }
 
@@ -38,6 +42,7 @@ export type ButcherSummary = Pick<
   | "specialty"
   | "google_rating"
   | "google_review_count"
+  | "six_cut_score"
 > & { hours: OpeningHours | null };
 
 export interface Media {

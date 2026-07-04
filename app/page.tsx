@@ -10,10 +10,10 @@ async function getButchers(): Promise<ButcherSummary[]> {
   const { data, error } = await db
     .from("butchers")
     .select(
-      "id, slug, name, address, lat, lng, neighborhood, specialty, google_rating, google_review_count, hours",
+      "id, slug, name, address, lat, lng, neighborhood, specialty, google_rating, google_review_count, six_cut_score, hours",
     )
     .eq("is_published", true)
-    .order("google_rating", { ascending: false });
+    .order("six_cut_score", { ascending: false, nullsFirst: false });
   if (error) console.error("[home] butchers query:", error.message);
   return (data ?? []) as ButcherSummary[];
 }

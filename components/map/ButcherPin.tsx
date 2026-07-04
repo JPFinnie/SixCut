@@ -1,20 +1,42 @@
 "use client";
 
 /**
- * Map pin as a hanging butcher's tag: punched hole, rating + shop name,
- * slight tilt that straightens when selected.
+ * Map pin as a hanging butcher's tag. Compact mode (city zoom) is a small
+ * score dot; full mode (zoomed in) shows the tag with score + shop name.
  */
 export function ButcherPin({
   selected,
-  rating,
+  score,
   name,
+  compact = false,
 }: {
   selected: boolean;
-  rating: number | null;
+  score: number | null;
   name: string;
+  compact?: boolean;
 }) {
+  const label = `${name}${score != null ? `, Six Cut Score ${score.toFixed(1)} out of 10` : ""}`;
+
+  if (compact && !selected) {
+    return (
+      <div
+        role="button"
+        aria-label={label}
+        className="group flex flex-col items-center cursor-pointer transition-transform duration-150 hover:scale-125"
+      >
+        <div className="grid place-items-center h-6 w-6 rounded-full border-2 bg-surface border-oxblood text-oxblood shadow-md">
+          <span className="font-display font-bold text-[9px] leading-none">
+            {score != null ? score.toFixed(1) : "—"}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
+      role="button"
+      aria-label={label}
       className={`group flex flex-col items-center cursor-pointer transition-transform duration-200 ease-out ${
         selected ? "scale-125 z-10" : "hover:scale-110"
       }`}
@@ -26,20 +48,18 @@ export function ButcherPin({
             : "-rotate-3 bg-surface border-oxblood text-oxblood group-hover:-rotate-1"
           }`}
       >
-        {/* punched hole */}
         <span
           className={`absolute -top-[5px] h-2 w-2 rounded-full border-2 ${
             selected ? "bg-oxblood-ink border-oxblood-strong" : "bg-background border-oxblood"
           }`}
         />
         <span className="font-display font-bold text-sm leading-none tracking-tight">
-          {rating != null ? rating.toFixed(1) : "—"}
+          {score != null ? score.toFixed(1) : "—"}
         </span>
         <span className="w-full text-center text-[8px] font-semibold uppercase tracking-[0.08em] leading-tight truncate opacity-90">
           {name}
         </span>
       </div>
-      {/* pointer */}
       <div className={`h-2 w-0.5 ${selected ? "bg-oxblood-strong" : "bg-oxblood/70"}`} />
     </div>
   );

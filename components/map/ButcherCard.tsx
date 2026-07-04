@@ -5,7 +5,7 @@ import useSWR from "swr";
 import type { ButcherSummary, Review } from "@/lib/types";
 import { fetcher } from "@/lib/fetcher";
 import { isOpenNow, todayHoursLine } from "@/lib/hours";
-import { StarRating } from "@/components/ui/StarRating";
+import { ScoreDuo } from "@/components/ui/ScoreDuo";
 
 /** Slide-out ledger card for the selected butcher. */
 export function ButcherCard({
@@ -54,7 +54,12 @@ export function ButcherCard({
           </button>
         </div>
 
-        <StarRating rating={butcher.google_rating} count={butcher.google_review_count} />
+        <ScoreDuo
+          sixCutScore={butcher.six_cut_score}
+          googleRating={butcher.google_rating}
+          googleCount={butcher.google_review_count}
+          compact
+        />
 
         <div className="text-sm text-muted flex flex-col gap-1">
           {butcher.address && <p>{butcher.address}</p>}

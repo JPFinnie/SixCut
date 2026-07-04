@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import type { ButcherSummary, Specialty } from "@/lib/types";
 import { useMapStore } from "@/store/useMapStore";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { CleaverLogo } from "@/components/ui/CleaverLogo";
 
-const RATINGS = [4.5, 4, 3.5] as const;
+const SCORES = [8, 7, 6] as const;
 
 /** Map-overlay filter bar: brand lockup, search, chips. */
 export function FilterBar({
@@ -29,7 +29,7 @@ export function FilterBar({
   );
 
   const active =
-    filters.neighborhood || filters.minRating || filters.specialty || filters.openNow || filters.q;
+    filters.neighborhood || filters.minScore || filters.specialty || filters.openNow || filters.q;
 
   return (
     <div className="absolute top-3 left-3 right-3 z-10 sm:right-auto sm:w-[27rem]">
@@ -47,7 +47,14 @@ export function FilterBar({
               </p>
             </div>
           </div>
-          <ThemeToggle />
+          <div className="flex flex-col items-end gap-0.5 text-[10px] uppercase tracking-[0.14em] font-semibold">
+            <Link href="/about" className="text-muted hover:text-oxblood transition-colors">
+              Why we built this
+            </Link>
+            <Link href="/methodology" className="text-muted hover:text-oxblood transition-colors">
+              How we score
+            </Link>
+          </div>
         </div>
 
         <div className="cut-line mx-4" />
@@ -90,17 +97,18 @@ export function FilterBar({
               ))}
             </select>
 
-            {RATINGS.map((r) => (
+            {SCORES.map((s) => (
               <button
-                key={r}
-                onClick={() => setFilter("minRating", filters.minRating === r ? null : r)}
+                key={s}
+                onClick={() => setFilter("minScore", filters.minScore === s ? null : s)}
+                title={`Six Cut Score ${s} or higher`}
                 className={`rounded-full px-2.5 py-1 text-xs font-semibold border transition-all ${
-                  filters.minRating === r
+                  filters.minScore === s
                     ? "bg-oxblood text-oxblood-ink border-oxblood shadow-sm"
                     : "bg-background border-line hover:border-oxblood"
                 }`}
               >
-                {r}★+
+                {s}+
               </button>
             ))}
 

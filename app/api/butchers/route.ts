@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { hasSupabaseEnv, supabaseServer } from "@/lib/supabase/server";
 
 const SUMMARY_COLS =
-  "id, slug, name, address, lat, lng, neighborhood, specialty, google_rating, google_review_count, hours";
+  "id, slug, name, address, lat, lng, neighborhood, specialty, google_rating, google_review_count, six_cut_score, hours";
 
 /**
  * GET /api/butchers — lean list for the map (PLAN.md §6).
@@ -19,8 +19,8 @@ export async function GET(req: NextRequest) {
   const neighborhood = p.get("neighborhood");
   if (neighborhood) query = query.eq("neighborhood", neighborhood);
 
-  const minRating = Number(p.get("minRating"));
-  if (minRating) query = query.gte("google_rating", minRating);
+  const minScore = Number(p.get("minScore"));
+  if (minScore) query = query.gte("six_cut_score", minScore);
 
   const specialty = p.get("specialty");
   if (specialty) query = query.contains("specialty", [specialty]);
@@ -28,8 +28,9 @@ export async function GET(req: NextRequest) {
   const q = p.get("q");
   if (q) query = query.or(`name.ilike.%${q}%,address.ilike.%${q}%`);
 
-  const { data, error } = await query.order("google_rating", {
+  const { data, error } = await query.order("six_cut_score", {
     ascending: false,
+    nullsFirst: false,
   });
 
   if (error) {

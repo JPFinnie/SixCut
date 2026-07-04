@@ -1,25 +1,8 @@
 @import "tailwindcss";
 @import "mapbox-gl/dist/mapbox-gl.css";
 
-/* Class-based dark mode: `dark:` utilities key off .dark on <html> */
-@custom-variant dark (&:where(.dark, .dark *));
-
 :root {
-  /* ── The Butcher's Ledger · light (butcher paper, daylight counter) ── */
-  --background: #f6f0e4;
-  --surface: #fffdf8;
-  --foreground: #221b14;
-  --muted: #7d7264;
-  --line: #e2d7c3;
-  --oxblood: #8a2f1e;
-  --oxblood-strong: #661f10;
-  --oxblood-ink: #f8efe2; /* text on oxblood */
-  --brass: #a97e28;
-  --shadow: 32 24 16;
-}
-
-.dark {
-  /* ── after-hours: espresso dark, oxblood glows, brass warms ── */
+  /* ── The Butcher's Ledger · after-hours (the only mode) ── */
   --background: #171310;
   --surface: #221c17;
   --foreground: #ede2d0;
@@ -29,7 +12,7 @@
   --oxblood-strong: #e07b60;
   --oxblood-ink: #1c0f0a;
   --brass: #d3a349;
-  --shadow: 0 0 0;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -50,7 +33,6 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body), system-ui, sans-serif;
-  transition: background-color 0.35s ease, color 0.35s ease;
 }
 
 /* ── Atmosphere: paper grain over everything ─────────────────────── */
@@ -60,21 +42,15 @@ body::after {
   inset: 0;
   z-index: 100;
   pointer-events: none;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-.dark body::after {
   opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* ── Reusable details ─────────────────────────────────────────────── */
-
-/* Butcher-diagram dashed hairline */
 .cut-line {
   border-top: 1.5px dashed var(--line);
 }
 
-/* Grade-stamp badge (detail page rating) */
 .stamp {
   border: 2.5px solid var(--oxblood);
   color: var(--oxblood);
@@ -115,9 +91,8 @@ body::after {
   overflow: hidden;
 }
 .mapboxgl-ctrl-group button + button { border-top: 1px solid var(--line) !important; }
-.dark .mapboxgl-ctrl-icon { filter: invert(0.85); }
+.mapboxgl-ctrl-icon { filter: invert(0.85); }
 
-/* Thin, themed scrollbars in cards */
 .themed-scroll::-webkit-scrollbar { width: 6px; }
 .themed-scroll::-webkit-scrollbar-thumb {
   background: var(--line);

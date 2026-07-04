@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Six Cut
 
-## Getting Started
+**Toronto's independent butchers, on one map.** Every shop gets two numbers:
+its Google rating, and the **Six Cut Score** — a transparent /10 built from
+semantic-heuristic analysis of recent review text
+([methodology](app/methodology/page.tsx), published in-app at `/methodology`).
 
-First, run the development server:
+Built to answer one question: *where is my local butcher?* — and to make
+supporting local the easy choice when buying animal products.
+
+## Stack
+
+Next.js 16 (App Router) · Tailwind CSS 4 · Mapbox GL (`react-map-gl/mapbox`) ·
+Supabase (Postgres + RLS) · Google Places API (New) · deployed on Vercel.
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env.local   # then fill in values
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Variable | What |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase project (anon = public reads via RLS) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only; used by scripts, never shipped |
+| `NEXT_PUBLIC_MAPBOX_TOKEN` | Public Mapbox token (restrict by domain) |
+| `GOOGLE_MAPS_API_KEY` | Server-only; Places API (New) enabled |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Apply migrations in `supabase/migrations/` via the Supabase SQL editor
+(or `supabase db push`), then:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm dev            # run the app
+```
 
-## Learn More
+## Data pipeline (re-runnable, in order)
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm discover       # tile the city with Places nearby-searches, add new shops
+pnpm cleanup        # unpublish non-retail noise (processors, wholesalers…)
+pnpm seed:photos    # store Places photo resource names per shop
+pnpm score          # compute the Six Cut Score for every shop (run monthly)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`pnpm seed` re-syncs the original curated list (rarely needed).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Ground rules
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Google review text is never persisted** — analyzed live, only derived
+  scores stored (Places ToS).
+- The Google API key never reaches the browser: photos proxy through
+  `/api/photo`, reviews through `/api/butchers/[id]/reviews`.
+- Scores are deterministic and pay-proof; the methodology page imports the
+  actual weights from [lib/scoring.ts](lib/scoring.ts) so it can't drift.
+- 3D interiors (Gaussian splats) are deferred — see [PLAN.md](PLAN.md) §11.
