@@ -3,10 +3,11 @@
 import { useMemo } from "react";
 import type { ButcherSummary, Specialty } from "@/lib/types";
 import { useMapStore } from "@/store/useMapStore";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const RATINGS = [4.5, 4, 3.5] as const;
 
-/** Map-overlay filter bar: neighborhood, rating, specialty, open-now, search. */
+/** Map-overlay filter bar: brand lockup, search, chips. */
 export function FilterBar({
   butchers,
   resultCount,
@@ -30,80 +31,95 @@ export function FilterBar({
     filters.neighborhood || filters.minRating || filters.specialty || filters.openNow || filters.q;
 
   return (
-    <div className="absolute top-3 left-3 right-3 z-10 sm:right-auto sm:w-[26rem] flex flex-col gap-2">
-      <div className="rounded-xl bg-background/95 backdrop-blur shadow-lg border border-parchment p-3 flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <h1 className="font-bold text-oxblood whitespace-nowrap">The Six Cut</h1>
-          <input
-            type="search"
-            placeholder="Search butchers…"
-            value={filters.q}
-            onChange={(e) => setFilter("q", e.target.value)}
-            className="w-full rounded-lg border border-parchment bg-white px-3 py-1.5 text-sm outline-none focus:border-oxblood"
-            aria-label="Search by name or address"
-          />
+    <div className="absolute top-3 left-3 right-3 z-10 sm:right-auto sm:w-[27rem]">
+      <div className="rise-in rounded-2xl bg-surface/95 backdrop-blur-md shadow-xl border border-line overflow-hidden">
+        {/* Brand strip */}
+        <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2">
+          <div className="leading-none">
+            <h1 className="font-display font-black text-xl tracking-tight text-oxblood">
+              The Six Cut
+            </h1>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-muted mt-1">
+              Toronto&apos;s independent butchers
+            </p>
+          </div>
+          <ThemeToggle />
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 text-sm">
-          <select
-            value={filters.neighborhood ?? ""}
-            onChange={(e) => setFilter("neighborhood", e.target.value || null)}
-            className="rounded-lg border border-parchment bg-white px-2 py-1 text-xs"
-            aria-label="Neighborhood"
-          >
-            <option value="">All neighborhoods</option>
-            {neighborhoods.map((n) => (
-              <option key={n}>{n}</option>
-            ))}
-          </select>
+        <div className="cut-line mx-4" />
 
-          <select
-            value={filters.specialty ?? ""}
-            onChange={(e) => setFilter("specialty", (e.target.value || null) as Specialty | null)}
-            className="rounded-lg border border-parchment bg-white px-2 py-1 text-xs capitalize"
-            aria-label="Specialty"
-          >
-            <option value="">All specialties</option>
-            {specialties.map((s) => (
-              <option key={s} value={s}>
-                {s.replace("_", " ")}
-              </option>
-            ))}
-          </select>
+        <div className="p-3 flex flex-col gap-2">
+          <input
+            type="search"
+            placeholder="Search shops or streets…"
+            value={filters.q}
+            onChange={(e) => setFilter("q", e.target.value)}
+            className="w-full rounded-lg border border-line bg-background px-3 py-2 text-sm outline-none
+                       placeholder:text-muted focus:border-oxblood transition-colors"
+            aria-label="Search by name or address"
+          />
 
-          {RATINGS.map((r) => (
+          <div className="flex flex-wrap items-center gap-1.5 text-sm">
+            <select
+              value={filters.neighborhood ?? ""}
+              onChange={(e) => setFilter("neighborhood", e.target.value || null)}
+              className="rounded-lg border border-line bg-background px-2 py-1.5 text-xs focus:border-oxblood outline-none"
+              aria-label="Neighborhood"
+            >
+              <option value="">All neighborhoods</option>
+              {neighborhoods.map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+            </select>
+
+            <select
+              value={filters.specialty ?? ""}
+              onChange={(e) => setFilter("specialty", (e.target.value || null) as Specialty | null)}
+              className="rounded-lg border border-line bg-background px-2 py-1.5 text-xs capitalize focus:border-oxblood outline-none"
+              aria-label="Specialty"
+            >
+              <option value="">All specialties</option>
+              {specialties.map((s) => (
+                <option key={s} value={s}>
+                  {s.replace("_", " ")}
+                </option>
+              ))}
+            </select>
+
+            {RATINGS.map((r) => (
+              <button
+                key={r}
+                onClick={() => setFilter("minRating", filters.minRating === r ? null : r)}
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold border transition-all ${
+                  filters.minRating === r
+                    ? "bg-oxblood text-oxblood-ink border-oxblood shadow-sm"
+                    : "bg-background border-line hover:border-oxblood"
+                }`}
+              >
+                {r}★+
+              </button>
+            ))}
+
             <button
-              key={r}
-              onClick={() => setFilter("minRating", filters.minRating === r ? null : r)}
-              className={`rounded-full px-2.5 py-1 text-xs font-medium border transition-colors ${
-                filters.minRating === r
-                  ? "bg-oxblood text-parchment border-oxblood"
-                  : "bg-white border-parchment hover:border-oxblood"
+              onClick={() => setFilter("openNow", !filters.openNow)}
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold border transition-all ${
+                filters.openNow
+                  ? "bg-brass text-background border-brass shadow-sm"
+                  : "bg-background border-line hover:border-brass"
               }`}
             >
-              {r}★+
+              Open now
             </button>
-          ))}
 
-          <button
-            onClick={() => setFilter("openNow", !filters.openNow)}
-            className={`rounded-full px-2.5 py-1 text-xs font-medium border transition-colors ${
-              filters.openNow
-                ? "bg-green-700 text-white border-green-700"
-                : "bg-white border-parchment hover:border-green-700"
-            }`}
-          >
-            Open now
-          </button>
-
-          {active && (
-            <button
-              onClick={resetFilters}
-              className="text-xs text-ink-soft underline underline-offset-2 ml-auto"
-            >
-              Clear · {resultCount} shown
-            </button>
-          )}
+            {active && (
+              <button
+                onClick={resetFilters}
+                className="text-xs text-muted underline underline-offset-2 ml-auto hover:text-foreground"
+              >
+                Clear · {resultCount} shown
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

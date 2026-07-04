@@ -1,38 +1,125 @@
 @import "tailwindcss";
 @import "mapbox-gl/dist/mapbox-gl.css";
 
+/* Class-based dark mode: `dark:` utilities key off .dark on <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  /* Butcher-paper cream, charcoal ink, oxblood accent */
-  --background: #f7f3ec;
-  --foreground: #221e1a;
-  --oxblood: #7a2a1d;
-  --oxblood-dark: #5c1f15;
-  --parchment: #efe8db;
-  --ink-soft: #6b6257;
+  /* ── The Butcher's Ledger · light (butcher paper, daylight counter) ── */
+  --background: #f6f0e4;
+  --surface: #fffdf8;
+  --foreground: #221b14;
+  --muted: #7d7264;
+  --line: #e2d7c3;
+  --oxblood: #8a2f1e;
+  --oxblood-strong: #661f10;
+  --oxblood-ink: #f8efe2; /* text on oxblood */
+  --brass: #a97e28;
+  --shadow: 32 24 16;
+}
+
+.dark {
+  /* ── after-hours: espresso dark, oxblood glows, brass warms ── */
+  --background: #171310;
+  --surface: #221c17;
+  --foreground: #ede2d0;
+  --muted: #a3968a;
+  --line: #3a322a;
+  --oxblood: #c95940;
+  --oxblood-strong: #e07b60;
+  --oxblood-ink: #1c0f0a;
+  --brass: #d3a349;
+  --shadow: 0 0 0;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
   --color-oxblood: var(--oxblood);
-  --color-oxblood-dark: var(--oxblood-dark);
-  --color-parchment: var(--parchment);
-  --color-ink-soft: var(--ink-soft);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-oxblood-strong: var(--oxblood-strong);
+  --color-oxblood-ink: var(--oxblood-ink);
+  --color-brass: var(--brass);
+  --font-sans: var(--font-body), system-ui, sans-serif;
+  --font-display: var(--font-display), georgia, serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
+  transition: background-color 0.35s ease, color 0.35s ease;
 }
 
-/* Mapbox chrome tweaks */
-.mapboxgl-popup-content {
-  border-radius: 0.5rem;
-  padding: 0;
+/* ── Atmosphere: paper grain over everything ─────────────────────── */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-.mapboxgl-ctrl-logo {
-  opacity: 0.6;
+.dark body::after {
+  opacity: 0.07;
+}
+
+/* ── Reusable details ─────────────────────────────────────────────── */
+
+/* Butcher-diagram dashed hairline */
+.cut-line {
+  border-top: 1.5px dashed var(--line);
+}
+
+/* Grade-stamp badge (detail page rating) */
+.stamp {
+  border: 2.5px solid var(--oxblood);
+  color: var(--oxblood);
+  border-radius: 6px;
+  transform: rotate(-6deg);
+  letter-spacing: 0.12em;
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--oxblood) 25%, transparent) inset;
+}
+
+/* ── Motion ───────────────────────────────────────────────────────── */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes card-in-right {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes card-in-up {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rise-in { animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.card-in { animation: card-in-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@media (min-width: 640px) {
+  .card-in { animation-name: card-in-right; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise-in, .card-in { animation: none; }
+}
+
+/* ── Mapbox chrome ────────────────────────────────────────────────── */
+.mapboxgl-ctrl-logo { opacity: 0.5; }
+.mapboxgl-ctrl-group {
+  background: var(--surface) !important;
+  border: 1px solid var(--line);
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+.mapboxgl-ctrl-group button + button { border-top: 1px solid var(--line) !important; }
+.dark .mapboxgl-ctrl-icon { filter: invert(0.85); }
+
+/* Thin, themed scrollbars in cards */
+.themed-scroll::-webkit-scrollbar { width: 6px; }
+.themed-scroll::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 3px;
 }

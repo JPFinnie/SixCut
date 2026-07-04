@@ -7,7 +7,7 @@ import { fetcher } from "@/lib/fetcher";
 import { isOpenNow, todayHoursLine } from "@/lib/hours";
 import { StarRating } from "@/components/ui/StarRating";
 
-/** Slide-out detail card for the selected butcher (PLAN.md §7). */
+/** Slide-out ledger card for the selected butcher. */
 export function ButcherCard({
   butcher,
   onClose,
@@ -27,18 +27,28 @@ export function ButcherCard({
 
   return (
     <aside
-      className="absolute z-20 bg-background shadow-2xl border border-parchment overflow-y-auto
-                 inset-x-0 bottom-0 max-h-[55%] rounded-t-2xl
-                 sm:inset-x-auto sm:right-4 sm:top-4 sm:bottom-4 sm:max-h-none sm:w-96 sm:rounded-xl"
+      className="card-in themed-scroll absolute z-20 bg-surface shadow-2xl border border-line overflow-y-auto
+                 inset-x-0 bottom-0 max-h-[58%] rounded-t-2xl
+                 sm:inset-x-auto sm:right-4 sm:top-4 sm:bottom-4 sm:max-h-none sm:w-[24rem] sm:rounded-2xl"
       aria-label={`Details for ${butcher.name}`}
     >
-      <div className="p-5 flex flex-col gap-3">
+      <div className="p-5 flex flex-col gap-3.5">
         <div className="flex items-start justify-between gap-2">
-          <h2 className="text-xl font-bold leading-tight">{butcher.name}</h2>
+          <div>
+            {butcher.neighborhood && (
+              <p className="text-[10px] uppercase tracking-[0.22em] text-oxblood font-semibold mb-1">
+                {butcher.neighborhood}
+              </p>
+            )}
+            <h2 className="font-display font-black text-2xl leading-[1.05] tracking-tight">
+              {butcher.name}
+            </h2>
+          </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="shrink-0 rounded-full h-8 w-8 grid place-items-center text-ink-soft hover:bg-parchment"
+            className="shrink-0 rounded-full h-8 w-8 grid place-items-center text-muted border border-transparent
+                       hover:border-line hover:text-foreground transition-colors"
           >
             ✕
           </button>
@@ -46,12 +56,12 @@ export function ButcherCard({
 
         <StarRating rating={butcher.google_rating} count={butcher.google_review_count} />
 
-        <div className="text-sm text-ink-soft flex flex-col gap-1">
+        <div className="text-sm text-muted flex flex-col gap-1">
           {butcher.address && <p>{butcher.address}</p>}
           {today && <p>{today}</p>}
           {open != null && (
-            <p className={open ? "text-green-700 font-medium" : "text-oxblood font-medium"}>
-              {open ? "Open now" : "Closed now"}
+            <p className={`font-semibold ${open ? "text-brass" : "text-oxblood"}`}>
+              {open ? "● Open now" : "○ Closed now"}
             </p>
           )}
         </div>
@@ -61,7 +71,7 @@ export function ButcherCard({
             {butcher.specialty.map((s) => (
               <span
                 key={s}
-                className="rounded-full bg-parchment px-2.5 py-0.5 text-xs font-medium capitalize"
+                className="rounded-full border border-dashed border-line px-2.5 py-0.5 text-xs font-medium capitalize text-muted"
               >
                 {s.replace("_", " ")}
               </span>
@@ -69,19 +79,25 @@ export function ButcherCard({
           </div>
         )}
 
-        <div className="border-t border-parchment pt-3">
-          <h3 className="text-sm font-semibold mb-2">Recent reviews</h3>
+        <div className="cut-line pt-3">
+          <h3 className="text-[10px] uppercase tracking-[0.22em] text-muted font-semibold mb-2.5">
+            From the reviews
+          </h3>
           {reviews === null ? (
-            <p className="text-sm text-ink-soft animate-pulse">Loading reviews…</p>
+            <p className="text-sm text-muted animate-pulse">Loading reviews…</p>
           ) : reviews.length === 0 ? (
-            <p className="text-sm text-ink-soft">No reviews available.</p>
+            <p className="text-sm text-muted">No reviews available.</p>
           ) : (
-            <ul className="flex flex-col gap-2.5">
+            <ul className="flex flex-col gap-3">
               {reviews.slice(0, 3).map((r, i) => (
                 <li key={i} className="text-sm">
-                  <span className="text-amber-600">{"★".repeat(Math.round(r.rating))}</span>{" "}
-                  <span className="text-ink-soft">· {r.authorName}</span>
-                  <p className="line-clamp-3 mt-0.5">{r.text}</p>
+                  <p className="font-display italic leading-snug line-clamp-3">
+                    “{r.text}”
+                  </p>
+                  <p className="text-xs text-muted mt-1">
+                    <span className="text-brass">{"★".repeat(Math.round(r.rating))}</span>{" "}
+                    — {r.authorName}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -90,9 +106,10 @@ export function ButcherCard({
 
         <Link
           href={`/butcher/${butcher.slug}`}
-          className="mt-1 block rounded-lg bg-oxblood px-4 py-2.5 text-center font-semibold text-parchment hover:bg-oxblood-dark transition-colors"
+          className="mt-1 block rounded-xl bg-oxblood px-4 py-3 text-center font-display font-bold text-oxblood-ink
+                     hover:bg-oxblood-strong hover:-translate-y-0.5 transition-all shadow-md"
         >
-          View Interior →
+          Step Inside →
         </Link>
       </div>
     </aside>

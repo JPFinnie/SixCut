@@ -5,6 +5,7 @@ import { hasSupabaseEnv, supabaseServer } from "@/lib/supabase/server";
 import type { Butcher, Media } from "@/lib/types";
 import { isOpenNow, todayHoursLine } from "@/lib/hours";
 import { StarRating } from "@/components/ui/StarRating";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { InteriorViewer } from "@/components/detail/InteriorViewer";
 import { ReviewList } from "@/components/detail/ReviewList";
 
@@ -68,31 +69,54 @@ export default async function ButcherPage({
   const today = todayHoursLine(butcher.hours);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-6 flex flex-col gap-6">
-      <nav>
-        <Link href="/" className="text-sm text-oxblood hover:underline">
+    <main className="mx-auto w-full max-w-3xl px-4 py-6 flex flex-col gap-8">
+      <nav className="rise-in flex items-center justify-between">
+        <Link
+          href="/"
+          className="text-sm font-semibold text-oxblood hover:underline underline-offset-4"
+        >
           ← Back to the map
         </Link>
+        <ThemeToggle />
       </nav>
 
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">{butcher.name}</h1>
+      <header className="rise-in relative flex flex-col gap-3" style={{ animationDelay: "60ms" }}>
+        {butcher.neighborhood && (
+          <p className="text-[11px] uppercase tracking-[0.26em] text-oxblood font-bold">
+            {butcher.neighborhood} · Toronto
+          </p>
+        )}
+        <div className="flex items-start justify-between gap-4">
+          <h1 className="font-display font-black tracking-tight leading-[0.98] text-[clamp(2.2rem,6vw,3.4rem)]">
+            {butcher.name}
+          </h1>
+          {butcher.google_rating != null && (
+            <div className="stamp hidden sm:flex flex-col items-center px-3.5 py-2 shrink-0 mt-2 select-none">
+              <span className="font-display font-black text-2xl leading-none">
+                {butcher.google_rating.toFixed(1)}
+              </span>
+              <span className="text-[9px] font-bold uppercase">Six Cut grade</span>
+            </div>
+          )}
+        </div>
+
         <StarRating
           rating={butcher.google_rating}
           count={butcher.google_review_count}
           className="text-lg"
         />
-        <div className="text-sm text-ink-soft flex flex-col gap-0.5">
+
+        <div className="text-sm text-muted flex flex-col gap-0.5">
           {butcher.address && <p>{butcher.address}</p>}
           {today && <p>{today}</p>}
           {open != null && (
-            <p className={open ? "text-green-700 font-medium" : "text-oxblood font-medium"}>
-              {open ? "Open now" : "Closed now"}
+            <p className={`font-semibold ${open ? "text-brass" : "text-oxblood"}`}>
+              {open ? "● Open now" : "○ Closed now"}
             </p>
           )}
-          <p className="flex gap-3 mt-1">
+          <p className="flex gap-4 mt-1">
             {butcher.phone && (
-              <a href={`tel:${butcher.phone}`} className="text-oxblood hover:underline">
+              <a href={`tel:${butcher.phone}`} className="text-oxblood font-medium hover:underline underline-offset-4">
                 {butcher.phone}
               </a>
             )}
@@ -101,19 +125,20 @@ export default async function ButcherPage({
                 href={butcher.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-oxblood hover:underline"
+                className="text-oxblood font-medium hover:underline underline-offset-4"
               >
                 Website ↗
               </a>
             )}
           </p>
         </div>
+
         {butcher.specialty.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {butcher.specialty.map((s) => (
               <span
                 key={s}
-                className="rounded-full bg-parchment px-2.5 py-0.5 text-xs font-medium capitalize"
+                className="rounded-full border border-dashed border-line px-2.5 py-0.5 text-xs font-medium capitalize text-muted"
               >
                 {s.replace("_", " ")}
               </span>
@@ -122,38 +147,52 @@ export default async function ButcherPage({
         )}
       </header>
 
-      <section aria-label="Interior">
-        <h2 className="text-lg font-semibold mb-2">Step inside</h2>
+      <section aria-label="Interior" className="rise-in" style={{ animationDelay: "120ms" }}>
+        <div className="cut-line mb-4" />
+        <h2 className="text-[11px] uppercase tracking-[0.26em] text-muted font-bold mb-3">
+          Step inside
+        </h2>
         <InteriorViewer butcherId={butcher.id} media={media} butcherName={butcher.name} />
       </section>
 
-      <section aria-label="Reviews">
-        <h2 className="text-lg font-semibold mb-2">Reviews</h2>
+      <section aria-label="Reviews" className="rise-in" style={{ animationDelay: "180ms" }}>
+        <div className="cut-line mb-4" />
+        <h2 className="text-[11px] uppercase tracking-[0.26em] text-muted font-bold mb-3">
+          What the neighbourhood says
+        </h2>
         <ReviewList butcherId={butcher.id} />
       </section>
 
       {related.length > 0 && (
-        <section aria-label="Related butchers">
-          <h2 className="text-lg font-semibold mb-2">
+        <section aria-label="Related butchers" className="rise-in" style={{ animationDelay: "240ms" }}>
+          <div className="cut-line mb-4" />
+          <h2 className="text-[11px] uppercase tracking-[0.26em] text-muted font-bold mb-3">
             More in {butcher.neighborhood ?? "the area"}
           </h2>
-          <ul className="flex flex-col gap-1.5">
+          <ul className="flex flex-col gap-2">
             {related.map((r) => (
-              <li key={r.slug}>
+              <li key={r.slug} className="flex items-baseline gap-2">
                 <Link
                   href={`/butcher/${r.slug}`}
-                  className="text-oxblood hover:underline"
+                  className="font-display font-semibold text-lg text-oxblood hover:underline underline-offset-4"
                 >
                   {r.name}
-                </Link>{" "}
+                </Link>
                 {r.google_rating != null && (
-                  <span className="text-sm text-ink-soft">{r.google_rating}★</span>
+                  <span className="text-sm text-brass">{r.google_rating}★</span>
                 )}
               </li>
             ))}
           </ul>
         </section>
       )}
+
+      <footer className="cut-line pt-4 pb-2 text-center">
+        <p className="font-display font-black text-oxblood">The Six Cut</p>
+        <p className="text-[10px] uppercase tracking-[0.22em] text-muted mt-0.5">
+          Know your butcher · Toronto
+        </p>
+      </footer>
     </main>
   );
 }

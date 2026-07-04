@@ -25,8 +25,11 @@ export function InteriorViewer({
 
   if (photos.length === 0 && !streetview) {
     return (
-      <div className="rounded-xl border border-parchment bg-parchment/50 p-8 text-center text-ink-soft">
-        Interior view coming soon.
+      <div className="rounded-2xl border border-dashed border-line p-10 text-center">
+        <p className="font-display italic text-muted">Interior view coming soon.</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-muted mt-1.5">
+          Photos are on the block
+        </p>
       </div>
     );
   }
@@ -39,10 +42,10 @@ export function InteriorViewer({
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`rounded-full px-3 py-1 text-xs font-medium border ${
+              className={`rounded-full px-3 py-1 text-xs font-semibold border transition-colors ${
                 tab === t
-                  ? "bg-oxblood text-parchment border-oxblood"
-                  : "bg-white border-parchment"
+                  ? "bg-oxblood text-oxblood-ink border-oxblood"
+                  : "bg-surface border-line hover:border-oxblood"
               }`}
             >
               {t === "photos" ? "Photos" : "Street View"}
@@ -52,7 +55,7 @@ export function InteriorViewer({
       )}
 
       {tab === "photos" && photos.length > 0 && (
-        <div className="relative rounded-xl overflow-hidden bg-black/5">
+        <div className="relative rounded-2xl overflow-hidden border border-line bg-black/5">
           {/* eslint-disable-next-line @next/next/no-img-element -- external, uncurated hosts */}
           <img
             src={photos[idx].url}
@@ -65,14 +68,14 @@ export function InteriorViewer({
               <button
                 aria-label="Previous photo"
                 onClick={() => setIdx((idx - 1 + photos.length) % photos.length)}
-                className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-background/90 shadow grid place-items-center hover:bg-background"
+                className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-surface/90 shadow grid place-items-center hover:bg-surface"
               >
                 ‹
               </button>
               <button
                 aria-label="Next photo"
                 onClick={() => setIdx((idx + 1) % photos.length)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-background/90 shadow grid place-items-center hover:bg-background"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-surface/90 shadow grid place-items-center hover:bg-surface"
               >
                 ›
               </button>
@@ -83,7 +86,7 @@ export function InteriorViewer({
                     aria-label={`Photo ${i + 1}`}
                     onClick={() => setIdx(i)}
                     className={`h-1.5 rounded-full transition-all ${
-                      i === idx ? "w-5 bg-parchment" : "w-1.5 bg-parchment/60"
+                      i === idx ? "w-5 bg-surface" : "w-1.5 bg-surface/60"
                     }`}
                   />
                 ))}
@@ -97,7 +100,7 @@ export function InteriorViewer({
         <iframe
           src={streetview.url}
           title={`Street View of ${butcherName}`}
-          className="w-full aspect-[4/3] rounded-xl border-0"
+          className="w-full aspect-[4/3] rounded-2xl border border-line"
           allowFullScreen
           loading="lazy"
         />
