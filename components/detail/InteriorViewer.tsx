@@ -3,6 +3,12 @@
 import { useState } from "react";
 import type { Media } from "@/lib/types";
 
+/** Places photos are stored as resource names; resolve via our proxy route. */
+const photoSrc = (m: Media, w = 1200) =>
+  m.url.startsWith("places/")
+    ? `/api/photo?name=${encodeURIComponent(m.url)}&w=${w}`
+    : m.url;
+
 /**
  * Interior viewer — MVP: photo gallery + optional Street View embed.
  * Splat-ready interface (PLAN.md §5): a 3D renderer drops in here later
@@ -58,7 +64,7 @@ export function InteriorViewer({
         <div className="relative rounded-2xl overflow-hidden border border-line bg-black/5">
           {/* eslint-disable-next-line @next/next/no-img-element -- external, uncurated hosts */}
           <img
-            src={photos[idx].url}
+            src={photoSrc(photos[idx])}
             alt={`Inside ${butcherName} (${idx + 1} of ${photos.length})`}
             className="w-full aspect-[4/3] object-cover"
             loading="lazy"

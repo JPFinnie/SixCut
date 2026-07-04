@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import type { ButcherSummary, Specialty } from "@/lib/types";
 import { useMapStore } from "@/store/useMapStore";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { CleaverLogo } from "@/components/ui/CleaverLogo";
 
 const RATINGS = [4.5, 4, 3.5] as const;
 
@@ -35,13 +36,16 @@ export function FilterBar({
       <div className="rise-in rounded-2xl bg-surface/95 backdrop-blur-md shadow-xl border border-line overflow-hidden">
         {/* Brand strip */}
         <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2">
-          <div className="leading-none">
-            <h1 className="font-display font-black text-xl tracking-tight text-oxblood">
-              The Six Cut
-            </h1>
-            <p className="text-[10px] uppercase tracking-[0.22em] text-muted mt-1">
-              Toronto&apos;s independent butchers
-            </p>
+          <div className="flex items-center gap-2.5">
+            <CleaverLogo size={34} className="text-oxblood shrink-0" />
+            <div className="leading-none">
+              <h1 className="font-display font-black text-xl tracking-tight text-oxblood">
+                The Six Cut
+              </h1>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-muted mt-1">
+                Toronto&apos;s independent butchers
+              </p>
+            </div>
           </div>
           <ThemeToggle />
         </div>

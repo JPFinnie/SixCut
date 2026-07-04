@@ -28,6 +28,7 @@ export interface PlaceDetails {
     relativePublishTimeDescription?: string;
     authorAttribution?: { displayName?: string; photoUri?: string };
   }>;
+  photos?: Array<{ name: string; widthPx?: number; heightPx?: number }>;
 }
 
 /** Resolve a place by free-text query (e.g. "Sanagan's Meat Locker Toronto"). */
@@ -60,14 +61,33 @@ const DETAILS_FIELDS = [
 
 export async function getPlaceDetails(
   placeId: string,
-  opts: { withReviews?: boolean } = {},
+  opts: { withReviews?: boolean; withPhotos?: boolean } = {},
 ): Promise<PlaceDetails> {
-  const fields = opts.withReviews ? `${DETAILS_FIELDS},reviews` : DETAILS_FIELDS;
+  let fields = DETAILS_FIELDS;
+  if (opts.withReviews) fields += ",reviews";
+  if (opts.withPhotos) fields += ",photos";
   const res = await fetch(`${BASE}/places/${placeId}`, {
     headers: { "X-Goog-Api-Key": apiKey(), "X-Goog-FieldMask": fields },
   });
   if (!res.ok) throw new Error(`placeDetails ${res.status}: ${await res.text()}`);
   return (await res.json()) as PlaceDetails;
+}
+
+/**
+ * Resolve a photo resource name ("places/{id}/photos/{ref}") to a short-lived
+ * googleusercontent URI. Server-only — the API key never reaches the client.
+ */
+export async function getPhotoUri(
+  photoName: string,
+  maxWidthPx = 1200,
+): Promise<string | null> {
+  const res = await fetch(
+    `${BASE}/${photoName}/media?maxWidthPx=${maxWidthPx}&skipHttpRedirect=true`,
+    { headers: { "X-Goog-Api-Key": apiKey() } },
+  );
+  if (!res.ok) return null;
+  const data = (await res.json()) as { photoUri?: string };
+  return data.photoUri ?? null;
 }
 
 /** Map raw Places reviews to our live (never persisted) Review shape. */

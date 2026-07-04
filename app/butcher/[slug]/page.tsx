@@ -6,6 +6,7 @@ import type { Butcher, Media } from "@/lib/types";
 import { isOpenNow, todayHoursLine } from "@/lib/hours";
 import { StarRating } from "@/components/ui/StarRating";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { CleaverLogo } from "@/components/ui/CleaverLogo";
 import { InteriorViewer } from "@/components/detail/InteriorViewer";
 import { ReviewList } from "@/components/detail/ReviewList";
 
@@ -188,6 +189,7 @@ export default async function ButcherPage({
       )}
 
       <footer className="cut-line pt-4 pb-2 text-center">
+        <CleaverLogo size={30} className="text-oxblood mx-auto mb-1.5" />
         <p className="font-display font-black text-oxblood">The Six Cut</p>
         <p className="text-[10px] uppercase tracking-[0.22em] text-muted mt-0.5">
           Know your butcher · Toronto

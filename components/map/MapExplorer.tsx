@@ -58,7 +58,11 @@ export function MapExplorer({ butchers }: { butchers: ButcherSummary[] }) {
                   select(b.id);
                 }}
               >
-                <ButcherPin selected={b.id === selectedId} rating={b.google_rating} />
+                <ButcherPin
+                  selected={b.id === selectedId}
+                  rating={b.google_rating}
+                  name={b.name}
+                />
               </Marker>
             ),
         )}
