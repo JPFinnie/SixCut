@@ -78,7 +78,7 @@ export default async function ButcherPage({
         >
           ← Back to the map
         </Link>
-        <CleaverLogo size={26} className="text-oxblood" />
+        <CleaverLogo size={40} className="text-oxblood" />
       </nav>
 
       <header className="rise-in relative flex flex-col gap-3" style={{ animationDelay: "60ms" }}>

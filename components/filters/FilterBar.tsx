@@ -32,7 +32,7 @@ export function FilterBar({
         {/* Brand strip */}
         <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2">
           <div className="flex items-center gap-2.5">
-            <CleaverLogo size={34} className="text-oxblood shrink-0" />
+            <CleaverLogo size={48} className="text-oxblood shrink-0" />
             <div className="leading-none">
               <h1 className="font-display font-black text-xl tracking-tight text-oxblood">
                 The Six Cut
