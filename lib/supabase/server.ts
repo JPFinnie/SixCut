@@ -1,11 +1,21 @@
 import { createClient } from "@supabase/supabase-js";
 
-/** True when Supabase env vars are configured (guards builds without creds). */
+/**
+ * True when Supabase env vars are configured AND well-formed (guards builds
+ * without creds and builds with mis-pasted values — a malformed URL must
+ * degrade to an empty site, never crash the deploy).
+ */
 export function hasSupabaseEnv(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return false;
+  try {
+    new URL(url);
+  } catch {
+    console.warn("[supabase] NEXT_PUBLIC_SUPABASE_URL is not a valid URL — check the env var value");
+    return false;
+  }
+  return true;
 }
 
 /**
