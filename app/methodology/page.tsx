@@ -104,9 +104,17 @@ export default function MethodologyPage() {
           </li>
           <li>
             Google shares at most <strong className="text-foreground">5 recent reviews</strong> per
-            shop. When fewer are available to analyze, the text components earn
-            proportionally less weight and the difference shifts to the rating
-            foundation — thin evidence is never treated as strong evidence.
+            shop at a time. When few reviews are available to analyze, the text
+            components earn proportionally less weight and the difference
+            shifts to the rating foundation — thin evidence is never treated
+            as strong evidence.
+          </li>
+          <li>
+            Each monthly refresh we bank the <strong className="text-foreground">signal counts</strong>{" "}
+            of every review we see — how many quality, service, and craft
+            markers it contained — never the review text itself. Scoring
+            combines this month&apos;s reviews with all banked signals from the
+            past 30 days.
           </li>
           <li>
             We analyze review text live and store only the resulting numbers —
@@ -123,6 +131,24 @@ export default function MethodologyPage() {
             No shop can pay to change its score. There is nothing to buy.
           </li>
         </ul>
+      </section>
+
+      <section className="rise-in flex flex-col gap-3" style={{ animationDelay: "240ms" }}>
+        <div className="cut-line" />
+        <h2 className="text-[11px] uppercase tracking-[0.26em] text-muted font-bold">
+          Scores get fairer every month
+        </h2>
+        <p className="text-sm text-muted leading-relaxed">
+          A brand-new score starts from a 5-review snapshot — the most Google
+          shares in one go. But every monthly refresh banks the signals of the
+          reviews it sees, so the pool each shop is judged on deepens over
+          time: a busy shop ends up scored on its full month of reviews, not a
+          handful. Expect scores to{" "}
+          <strong className="text-foreground">normalise as the archive grows</strong> — early
+          swings from one hot or cold review fade, and each shop converges
+          toward its true month-over-month form. Every shop&apos;s page shows how
+          many reviews its score was built from.
+        </p>
       </section>
 
       <footer className="cut-line pt-4 pb-2 text-center">

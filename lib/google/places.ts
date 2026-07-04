@@ -24,8 +24,10 @@ export interface PlaceDetails {
   userRatingCount?: number;
   businessStatus?: string; // OPERATIONAL | CLOSED_TEMPORARILY | CLOSED_PERMANENTLY
   reviews?: Array<{
+    name?: string; // review resource name — stable identity for signal archiving
     rating: number;
     text?: { text: string };
+    publishTime?: string;
     relativePublishTimeDescription?: string;
     authorAttribution?: { displayName?: string; photoUri?: string };
   }>;

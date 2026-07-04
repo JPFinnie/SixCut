@@ -31,7 +31,11 @@ export function ScoreBreakdownBars({ breakdown }: { breakdown: ScoreBreakdown })
       </div>
       <p className="text-[10px] text-muted mt-2.5">
         Weighted {Object.values(WEIGHTS).map((w) => `${w * 100}%`).join(" / ")} ·{" "}
-        {breakdown.reviewsAnalyzed} recent reviews analyzed · refreshed monthly
+        {breakdown.reviewsAnalyzed} recent reviews analyzed
+        {breakdown.archivedReviews
+          ? ` (${breakdown.archivedReviews} via our 30-day signal archive)`
+          : ""}{" "}
+        · refreshed monthly
       </p>
     </div>
   );

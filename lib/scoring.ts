@@ -6,7 +6,10 @@
  * drift from the code. Scores refresh monthly (pnpm score).
  *
  * Review text is analyzed live and never persisted — only the derived
- * numeric score and component breakdown are stored.
+ * numeric score, component breakdown, and per-review signal counts
+ * (review_signals table) are stored. Archived signals from the past 30
+ * days join each scoring run, so the analyzed pool deepens monthly beyond
+ * Google's 5-review window and scores normalise over time.
  */
 
 export const WEIGHTS = {
@@ -65,6 +68,20 @@ export interface ScoreBreakdown {
   reviewsAnalyzed: number;
   /** 0..1 — how much of the text weight was actually usable (n/4, capped). */
   textCoverage: number;
+  /** How many analyzed reviews came from the 30-day signal archive. */
+  archivedReviews?: number;
+}
+
+/**
+ * Per-review lexicon hit counts — the ONLY thing we ever persist about a
+ * review (review_signals table). Derived analysis, never text.
+ */
+export interface ReviewSignals {
+  qualityPos: number;
+  qualityNeg: number;
+  servicePos: number;
+  serviceNeg: number;
+  craft: number;
 }
 
 export interface SixCutScore {
@@ -100,27 +117,57 @@ const ratio = (pos: number, neg: number) => (pos + 1) / (pos + neg + 2);
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
+/** Extract lexicon signal counts from one review's text. */
+export function extractSignals(text: string): ReviewSignals {
+  const t = text.toLowerCase();
+  return {
+    qualityPos: hits(t, LEXICON.qualityPos),
+    qualityNeg: hits(t, LEXICON.qualityNeg),
+    servicePos: hits(t, LEXICON.servicePos),
+    serviceNeg: hits(t, LEXICON.serviceNeg),
+    craft: hits(t, LEXICON.craft),
+  };
+}
+
 export function computeSixCutScore(
   reviews: Array<{ text: string }>,
   googleRating: number | null,
   reviewCount: number | null,
 ): SixCutScore | null {
-  // Nothing to go on: no rating and no reviews → unrated.
-  if (googleRating == null && reviews.length === 0) return null;
+  return computeFromSignals(
+    reviews.map((r) => extractSignals(r.text)),
+    googleRating,
+    reviewCount,
+  );
+}
 
-  const corpus = reviews.map((r) => r.text.toLowerCase());
+/**
+ * Score from per-review signals. Live reviews and archived signals are
+ * interchangeable here — which is what lets the analyzed pool deepen
+ * month over month without ever storing review text.
+ */
+export function computeFromSignals(
+  signals: ReviewSignals[],
+  googleRating: number | null,
+  reviewCount: number | null,
+  meta: { archived?: number } = {},
+): SixCutScore | null {
+  // Nothing to go on: no rating and no reviews → unrated.
+  if (googleRating == null && signals.length === 0) return null;
+
   let qp = 0, qn = 0, sp = 0, sn = 0, cr = 0;
-  for (const text of corpus) {
-    qp += hits(text, LEXICON.qualityPos);
-    qn += hits(text, LEXICON.qualityNeg);
-    sp += hits(text, LEXICON.servicePos);
-    sn += hits(text, LEXICON.serviceNeg);
-    cr += hits(text, LEXICON.craft);
+  for (const s of signals) {
+    qp += s.qualityPos;
+    qn += s.qualityNeg;
+    sp += s.servicePos;
+    sn += s.serviceNeg;
+    cr += s.craft;
   }
 
-  // How much text evidence we actually have. Google returns at most 5
-  // recent reviews; 4+ analyzable reviews earns full text weight.
-  const textCoverage = clamp01(corpus.length / 4);
+  // How much text evidence we actually have. Google exposes at most 5
+  // recent reviews per fetch; the 30-day archive grows this pool monthly.
+  // 4+ analyzable reviews earns full text weight.
+  const textCoverage = clamp01(signals.length / 4);
 
   const breakdown: ScoreBreakdown = {
     quality: ratio(qp, qn),
@@ -128,8 +175,9 @@ export function computeSixCutScore(
     craft: clamp01(cr / 4), // 4+ craft markers = full marks
     rating: googleRating != null ? clamp01((googleRating - 3) / 2) : 0.5,
     volume: clamp01(Math.log10((reviewCount ?? 0) + 1) / 2.7), // ~500 reviews = full marks
-    reviewsAnalyzed: corpus.length,
+    reviewsAnalyzed: signals.length,
     textCoverage,
+    ...(meta.archived ? { archivedReviews: meta.archived } : {}),
   };
 
   // Text components earn only as much weight as their evidence supports;
