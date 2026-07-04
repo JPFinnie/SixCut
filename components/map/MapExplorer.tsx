@@ -20,7 +20,6 @@ export function MapExplorer({ butchers }: { butchers: ButcherSummary[] }) {
   const visible = useMemo(() => {
     const q = filters.q.trim().toLowerCase();
     return butchers.filter((b) => {
-      if (filters.neighborhood && b.neighborhood !== filters.neighborhood) return false;
       if (filters.minScore && (b.six_cut_score ?? 0) < filters.minScore) return false;
       if (filters.specialty && !b.specialty.includes(filters.specialty)) return false;
       if (filters.openNow && isOpenNow(b.hours) !== true) return false;
@@ -41,7 +40,7 @@ export function MapExplorer({ butchers }: { butchers: ButcherSummary[] }) {
         onClick={() => select(null)}
         onMove={(e) => setCompact(e.viewState.zoom < TAG_ZOOM)}
       >
-        <NavigationControl position="bottom-right" />
+        <NavigationControl position="bottom-right" showCompass={false} />
         {visible.map(
           (b) =>
             b.lat != null &&

@@ -18,18 +18,13 @@ export function FilterBar({
 }) {
   const { filters, setFilter, resetFilters } = useMapStore();
 
-  const neighborhoods = useMemo(
-    () =>
-      [...new Set(butchers.map((b) => b.neighborhood).filter((n): n is string => !!n))].sort(),
-    [butchers],
-  );
   const specialties = useMemo(
     () => [...new Set(butchers.flatMap((b) => b.specialty))].sort() as Specialty[],
     [butchers],
   );
 
   const active =
-    filters.neighborhood || filters.minScore || filters.specialty || filters.openNow || filters.q;
+    filters.minScore || filters.specialty || filters.openNow || filters.q;
 
   return (
     <div className="absolute top-3 left-3 right-3 z-10 sm:right-auto sm:w-[27rem]">
@@ -47,14 +42,16 @@ export function FilterBar({
               </p>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-0.5 text-[10px] uppercase tracking-[0.14em] font-semibold">
-            <Link href="/about" className="text-muted hover:text-oxblood transition-colors">
-              Why we built this
-            </Link>
-            <Link href="/methodology" className="text-muted hover:text-oxblood transition-colors">
-              How we score
-            </Link>
-          </div>
+        </div>
+
+        <div className="flex items-center gap-2 px-4 pb-2 text-[10px] uppercase tracking-[0.14em] font-semibold whitespace-nowrap">
+          <Link href="/about" className="text-muted hover:text-oxblood transition-colors">
+            Why we built this
+          </Link>
+          <span aria-hidden className="text-line">·</span>
+          <Link href="/methodology" className="text-muted hover:text-oxblood transition-colors">
+            How we score
+          </Link>
         </div>
 
         <div className="cut-line mx-4" />
@@ -71,18 +68,6 @@ export function FilterBar({
           />
 
           <div className="flex flex-wrap items-center gap-1.5 text-sm">
-            <select
-              value={filters.neighborhood ?? ""}
-              onChange={(e) => setFilter("neighborhood", e.target.value || null)}
-              className="rounded-lg border border-line bg-background px-2 py-1.5 text-xs focus:border-oxblood outline-none"
-              aria-label="Neighborhood"
-            >
-              <option value="">All neighborhoods</option>
-              {neighborhoods.map((n) => (
-                <option key={n}>{n}</option>
-              ))}
-            </select>
-
             <select
               value={filters.specialty ?? ""}
               onChange={(e) => setFilter("specialty", (e.target.value || null) as Specialty | null)}

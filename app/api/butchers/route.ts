@@ -16,9 +16,6 @@ export async function GET(req: NextRequest) {
 
   let query = db.from("butchers").select(SUMMARY_COLS).eq("is_published", true);
 
-  const neighborhood = p.get("neighborhood");
-  if (neighborhood) query = query.eq("neighborhood", neighborhood);
-
   const minScore = Number(p.get("minScore"));
   if (minScore) query = query.gte("six_cut_score", minScore);
 

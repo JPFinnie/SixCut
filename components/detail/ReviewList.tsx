@@ -22,17 +22,8 @@ export function ReviewList({ butcherId }: { butcherId: string }) {
   return (
     <ul className="flex flex-col gap-3">
       {reviews.map((r, i) => (
-        <li
-          key={i}
-          className="rounded-2xl border border-line bg-surface p-5 relative overflow-hidden"
-        >
-          <span
-            aria-hidden
-            className="absolute -top-3 left-3 font-display font-black text-6xl text-oxblood/10 select-none"
-          >
-            “
-          </span>
-          <p className="font-display italic leading-relaxed relative">{r.text}</p>
+        <li key={i} className="rounded-2xl border border-line bg-surface p-5">
+          <p className="font-display italic leading-relaxed">{r.text}</p>
           <div className="flex items-center gap-2 mt-3">
             {r.profilePhotoUrl && (
               // eslint-disable-next-line @next/next/no-img-element -- Google-hosted avatar

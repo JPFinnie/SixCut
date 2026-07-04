@@ -2,7 +2,6 @@ import { create } from "zustand";
 import type { Specialty } from "@/lib/types";
 
 export interface Filters {
-  neighborhood: string | null;
   minScore: number | null; // Six Cut Score threshold: 8 | 7 | 6
   specialty: Specialty | null;
   openNow: boolean;
@@ -10,7 +9,6 @@ export interface Filters {
 }
 
 export const EMPTY_FILTERS: Filters = {
-  neighborhood: null,
   minScore: null,
   specialty: null,
   openNow: false,
