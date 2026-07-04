@@ -187,7 +187,11 @@ async function main() {
         google_rating: d.rating ?? null,
         google_review_count: d.userRatingCount ?? null,
         reviews_synced_at: new Date().toISOString(),
-        is_published: true,
+        // Zero-review shops stay hidden until they earn reviews: no social
+        // proof usually means a wholesale/production listing, not a counter
+        // (see audit-unrated.ts). Re-running discover flips them on once
+        // they're reviewed... via manual publish after an audit pass.
+        is_published: (d.userRatingCount ?? 0) > 0,
       });
       if (error) throw error;
       added++;

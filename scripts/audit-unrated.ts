@@ -24,8 +24,7 @@ async function main() {
 
   const { data, error } = await db
     .from("butchers")
-    .select("slug, name, address, neighborhood")
-    .eq("is_published", true)
+    .select("slug, name, address, neighborhood, is_published")
     .is("google_rating", null);
   if (error) throw error;
 
@@ -34,17 +33,21 @@ async function main() {
     return;
   }
 
-  console.log(`${data.length} published shop(s) with zero Google reviews — eyeball these:\n`);
+  console.log(
+    `${data.length} zero-review shop(s) (all hidden from the map by policy) — eyeball these:\n`,
+  );
   for (const b of data) {
     const noStreetNumber = !/^\d/.test(b.address ?? "");
     console.log(
-      `${noStreetNumber ? "⚠ " : "  "}${b.name} — ${b.address ?? "no address"} (${b.neighborhood ?? "?"}) [${b.slug}]`,
+      `${noStreetNumber ? "⚠ " : "  "}${b.is_published ? "PUBLISHED " : ""}${b.name} — ${b.address ?? "no address"} (${b.neighborhood ?? "?"}) [${b.slug}]`,
     );
   }
   console.log(
     "\n⚠ = no street number, the strongest single tell so far for a non-retail listing.",
   );
-  console.log("To unpublish one: pnpm exec tsx scripts/unpublish.ts <slug>");
+  console.log(
+    "Zero-review shops publish automatically once pnpm score finds reviews for them.",
+  );
 }
 
 main().catch((e) => {

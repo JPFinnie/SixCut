@@ -37,10 +37,14 @@ async function main() {
   if (!url || !key) throw new Error("Set Supabase env vars in .env.local");
   const db = createClient(url, key, { auth: { persistSession: false } });
 
+  // Include unpublished zero-review shops: if Google now has reviews for
+  // them, they earn their spot on the map (see audit-unrated.ts policy).
   const { data: butchers, error } = await db
     .from("butchers")
-    .select("id, slug, google_place_id, google_rating, google_review_count, specialty")
-    .eq("is_published", true);
+    .select(
+      "id, slug, google_place_id, google_rating, google_review_count, specialty, is_published",
+    )
+    .or("is_published.eq.true,google_rating.is.null");
   if (error) throw error;
 
   let scored = 0;
@@ -72,6 +76,11 @@ async function main() {
         const inferred = inferSpecialties(reviews.map((r) => r.text));
         if (inferred.length) update.specialty = inferred;
       }
+
+      // Zero-review shops are hidden by policy; publish once reviews exist.
+      const nowHasReviews = (details.userRatingCount ?? 0) > 0;
+      if (!b.is_published && nowHasReviews) update.is_published = true;
+      if (b.is_published === false && !nowHasReviews) update.six_cut_score = null;
 
       const { error: upErr } = await db.from("butchers").update(update).eq("id", b.id);
       if (upErr) throw upErr;
