@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx scripts/seed.ts",
-    "seed:photos": "tsx scripts/seed-photos.ts"
+    "seed:photos": "tsx scripts/seed-photos.ts",
+    "discover": "tsx scripts/discover.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

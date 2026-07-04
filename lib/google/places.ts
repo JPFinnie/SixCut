@@ -22,6 +22,7 @@ export interface PlaceDetails {
   regularOpeningHours?: OpeningHours;
   rating?: number;
   userRatingCount?: number;
+  businessStatus?: string; // OPERATIONAL | CLOSED_TEMPORARILY | CLOSED_PERMANENTLY
   reviews?: Array<{
     rating: number;
     text?: { text: string };
@@ -57,7 +58,37 @@ const DETAILS_FIELDS = [
   "regularOpeningHours",
   "rating",
   "userRatingCount",
+  "businessStatus",
 ].join(",");
+
+/**
+ * Nearby search restricted to a place type (e.g. "butcher_shop").
+ * Returns up to 20 places per call — tile the city with multiple circles.
+ */
+export async function searchNearby(
+  center: { latitude: number; longitude: number },
+  radiusMeters: number,
+  includedType = "butcher_shop",
+): Promise<Array<{ id: string; displayName?: { text: string }; businessStatus?: string }>> {
+  const res = await fetch(`${BASE}/places:searchNearby`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": apiKey(),
+      "X-Goog-FieldMask": "places.id,places.displayName,places.businessStatus",
+    },
+    body: JSON.stringify({
+      includedTypes: [includedType],
+      maxResultCount: 20,
+      locationRestriction: { circle: { center, radius: radiusMeters } },
+    }),
+  });
+  if (!res.ok) throw new Error(`searchNearby ${res.status}: ${await res.text()}`);
+  const data = (await res.json()) as {
+    places?: Array<{ id: string; displayName?: { text: string }; businessStatus?: string }>;
+  };
+  return data.places ?? [];
+}
 
 export async function getPlaceDetails(
   placeId: string,
