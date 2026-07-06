@@ -7,6 +7,7 @@ import { isOpenNow } from "@/lib/hours";
 import { useMapStore } from "@/store/useMapStore";
 import { ButcherPin } from "./ButcherPin";
 import { ButcherCard } from "./ButcherCard";
+import { MapLegend } from "./MapLegend";
 import { FilterBar } from "@/components/filters/FilterBar";
 
 const TORONTO = { longitude: -79.38, latitude: 43.68, zoom: 11.5 };
@@ -87,6 +88,7 @@ export function MapExplorer({ butchers }: { butchers: ButcherSummary[] }) {
       </Map>
 
       <FilterBar butchers={butchers} resultCount={visible.length} />
+      {butchers.length > 0 && <MapLegend />}
 
       {butchers.length === 0 && (
         <div className="absolute inset-0 z-10 grid place-items-center pointer-events-none">

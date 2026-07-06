@@ -12,6 +12,12 @@
   --oxblood-strong: #e07b60;
   --oxblood-ink: #1c0f0a;
   --brass: #d3a349;
+  /* Six Cut Score tiers — one hue, hotter = higher; neutral = under 6 or
+     unrated. All ≥3:1 against --surface (see lib/scoreTier.ts). */
+  --score-high: #e07b60;
+  --score-mid: #c95940;
+  --score-low: #ad4f37;
+  --score-none: #8a7b6e;
   color-scheme: dark;
 }
 
@@ -25,6 +31,10 @@
   --color-oxblood-strong: var(--oxblood-strong);
   --color-oxblood-ink: var(--oxblood-ink);
   --color-brass: var(--brass);
+  --color-score-high: var(--score-high);
+  --color-score-mid: var(--score-mid);
+  --color-score-low: var(--score-low);
+  --color-score-none: var(--score-none);
   --font-sans: var(--font-body), system-ui, sans-serif;
   --font-display: var(--font-display), georgia, serif;
 }
@@ -103,6 +113,12 @@ body::after {
    Both variants are always in the DOM; a single data attribute on the
    map root decides which shows. Toggled via direct DOM (no React state,
    no re-render of 124 markers mid-gesture) and with no morph animation. */
+/* Score-tier color, consumed by the pin via var(--tier). */
+.pin { --tier: var(--score-none); }
+.pin[data-tier="high"] { --tier: var(--score-high); }
+.pin[data-tier="mid"] { --tier: var(--score-mid); }
+.pin[data-tier="low"] { --tier: var(--score-low); }
+
 .pin-dot { display: none; }
 .map-root[data-compact="true"] .pin[data-sel="false"] .pin-dot { display: grid; }
 .map-root[data-compact="true"] .pin[data-sel="false"] .pin-tag { display: none; }

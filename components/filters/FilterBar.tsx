@@ -6,7 +6,12 @@ import type { ButcherSummary, Specialty } from "@/lib/types";
 import { useMapStore } from "@/store/useMapStore";
 import { CleaverLogo } from "@/components/ui/CleaverLogo";
 
-const SCORES = [8, 7, 6] as const;
+/** Score chips share the pin tier ramp (lib/scoreTier.ts) so the map key reads across both. */
+const SCORES = [
+  { min: 8, active: "bg-score-high border-score-high", dot: "bg-score-high" },
+  { min: 7, active: "bg-score-mid border-score-mid", dot: "bg-score-mid" },
+  { min: 6, active: "bg-score-low border-score-low", dot: "bg-score-low" },
+] as const;
 
 /** Map-overlay filter bar: brand lockup, search, chips. */
 export function FilterBar({
@@ -82,18 +87,24 @@ export function FilterBar({
               ))}
             </select>
 
-            {SCORES.map((s) => (
+            {SCORES.map(({ min, active, dot }) => (
               <button
-                key={s}
-                onClick={() => setFilter("minScore", filters.minScore === s ? null : s)}
-                title={`Six Cut Score ${s} or higher`}
-                className={`rounded-full px-2.5 py-1 text-xs font-semibold border transition-all ${
-                  filters.minScore === s
-                    ? "bg-oxblood text-oxblood-ink border-oxblood shadow-sm"
+                key={min}
+                onClick={() => setFilter("minScore", filters.minScore === min ? null : min)}
+                title={`Six Cut Score ${min} or higher`}
+                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold border transition-all ${
+                  filters.minScore === min
+                    ? `${active} text-oxblood-ink shadow-sm`
                     : "bg-background border-line hover:border-oxblood"
                 }`}
               >
-                {s}+
+                <span
+                  aria-hidden
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    filters.minScore === min ? "bg-oxblood-ink/60" : dot
+                  }`}
+                />
+                {min}+
               </button>
             ))}
 
