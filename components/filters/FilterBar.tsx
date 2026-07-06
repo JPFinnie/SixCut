@@ -59,12 +59,12 @@ export function FilterBar({
         <div className="p-3 flex flex-col gap-2">
           <input
             type="search"
-            placeholder="Search shops or streets…"
+            placeholder="Search shops, streets, or specialties…"
             value={filters.q}
             onChange={(e) => setFilter("q", e.target.value)}
             className="w-full rounded-lg border border-line bg-background px-3 py-2 text-sm outline-none
                        placeholder:text-muted focus:border-oxblood transition-colors"
-            aria-label="Search by name or address"
+            aria-label="Search by name, address, or specialty"
           />
 
           <div className="flex flex-wrap items-center gap-1.5 text-sm">

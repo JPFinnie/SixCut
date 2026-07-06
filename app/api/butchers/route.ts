@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hasSupabaseEnv, supabaseServer } from "@/lib/supabase/server";
+import { SPECIALTIES } from "@/lib/types";
 
 const SUMMARY_COLS =
   "id, slug, name, address, lat, lng, neighborhood, specialty, google_rating, google_review_count, six_cut_score, hours";
 
 /**
  * GET /api/butchers — lean list for the map (PLAN.md §6).
- * Query: neighborhood, minRating, specialty, q. (openNow is computed
+ * Query: neighborhood, minRating, specialty, q (matches name, address,
+ * or specialty). (openNow is computed
  * client-side from `hours` to keep this response cacheable.)
  */
 export async function GET(req: NextRequest) {
@@ -23,7 +25,15 @@ export async function GET(req: NextRequest) {
   if (specialty) query = query.contains("specialty", [specialty]);
 
   const q = p.get("q");
-  if (q) query = query.or(`name.ilike.%${q}%,address.ilike.%${q}%`);
+  if (q) {
+    const ors = [`name.ilike.%${q}%`, `address.ilike.%${q}%`];
+    // "custom cuts" → "custom_cuts"; partial terms like "char" match too.
+    const term = q.trim().toLowerCase().replace(/\s+/g, "_");
+    for (const s of SPECIALTIES) {
+      if (s.includes(term)) ors.push(`specialty.cs.{${s}}`);
+    }
+    query = query.or(ors.join(","));
+  }
 
   const { data, error } = await query.order("six_cut_score", {
     ascending: false,

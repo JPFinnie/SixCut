@@ -33,12 +33,18 @@ export function MapExplorer({ butchers }: { butchers: ButcherSummary[] }) {
   };
 
   const visible = useMemo(() => {
-    const q = filters.q.trim().toLowerCase();
+    // Underscores normalize to spaces so "custom cuts" matches "custom_cuts".
+    const q = filters.q.trim().toLowerCase().replace(/_/g, " ");
     return butchers.filter((b) => {
       if (filters.minScore && (b.six_cut_score ?? 0) < filters.minScore) return false;
       if (filters.specialty && !b.specialty.includes(filters.specialty)) return false;
       if (filters.openNow && isOpenNow(b.hours) !== true) return false;
-      if (q && !`${b.name} ${b.address ?? ""}`.toLowerCase().includes(q)) return false;
+      if (q) {
+        const haystack = `${b.name} ${b.address ?? ""} ${b.specialty.join(" ")}`
+          .toLowerCase()
+          .replace(/_/g, " ");
+        if (!haystack.includes(q)) return false;
+      }
       return true;
     });
   }, [butchers, filters]);
