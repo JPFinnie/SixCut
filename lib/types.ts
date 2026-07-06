@@ -1,11 +1,14 @@
-export type Specialty =
-  | "beef"
-  | "pork"
-  | "poultry"
-  | "game"
-  | "lamb"
-  | "charcuterie"
-  | "custom_cuts";
+export const SPECIALTIES = [
+  "beef",
+  "pork",
+  "poultry",
+  "game",
+  "lamb",
+  "charcuterie",
+  "custom_cuts",
+] as const;
+
+export type Specialty = (typeof SPECIALTIES)[number];
 
 import type { ScoreBreakdown } from "@/lib/scoring";
 
