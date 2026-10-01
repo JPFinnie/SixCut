@@ -69,10 +69,11 @@ export function MapExplorer({ butchers: initialButchers, unavailable = false }: 
     });
   }, [butchers, filters]);
 
+  const flowLayout = showList || butchers.length === 0;
   const selected = visible.find((b) => b.id === selectedId) ?? null;
 
   return (
-    <div ref={rootRef} className="map-root relative flex-1 min-h-0">
+    <div ref={rootRef} className={`map-root relative flex-1 min-h-0 ${flowLayout ? "overflow-y-auto" : ""}`}>
       {!showList && <Map
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         initialViewState={TORONTO}
@@ -107,16 +108,22 @@ export function MapExplorer({ butchers: initialButchers, unavailable = false }: 
         )}
       </Map>}
 
-      <FilterBar butchers={butchers} resultCount={visible.length} />
+      <FilterBar butchers={butchers} resultCount={visible.length} inline={flowLayout} />
       {!showList && butchers.length > 0 && <MapLegend />}
       {butchers.length > 0 && !mapFailed && process.env.NEXT_PUBLIC_MAPBOX_TOKEN && (
         <button className="absolute bottom-5 left-3 z-10 rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold shadow-lg"
-          onClick={() => setListView(!listView)}>
+          onClick={() => {
+            if (listView) {
+              compactRef.current = TORONTO.zoom < TAG_ZOOM;
+              rootRef.current?.setAttribute("data-compact", String(compactRef.current));
+            }
+            setListView(!listView);
+          }}>
           {showList ? "Show map" : "Browse list"}
         </button>
       )}
       {showList && butchers.length > 0 && (
-        <section aria-label="Butcher directory" className="absolute inset-x-3 top-72 bottom-20 overflow-y-auto rounded-2xl border border-line bg-surface p-4 sm:top-64 sm:max-w-2xl">
+        <section aria-label="Butcher directory" className="relative mx-3 mb-20 rounded-2xl border border-line bg-surface p-4 sm:max-w-2xl">
           <h2 className="font-display text-lg font-bold">{visible.length} shops found</h2>
           {mapFailed && <p className="text-sm text-muted mb-3" role="status">The map is unavailable in this browser. You can still browse every shop below.</p>}
           <ul className="divide-y divide-line">
@@ -132,7 +139,7 @@ export function MapExplorer({ butchers: initialButchers, unavailable = false }: 
       )}
 
       {(butchers.length === 0 || visible.length === 0) && (
-        <div className="absolute inset-x-3 top-72 bottom-16 z-10 grid place-items-center pointer-events-none sm:top-64">
+        <div className={`${flowLayout ? "relative mx-3 my-8" : "absolute inset-x-3 top-72 bottom-16 sm:top-64"} z-10 grid place-items-center pointer-events-none`}>
           <div className="pointer-events-auto rise-in rounded-2xl bg-surface/95 border border-line shadow-xl px-8 py-6 text-center max-w-sm" role="status">
             <p className="font-display font-bold text-lg text-oxblood">
               {directoryUnavailable ? "The directory is taking a break" : butchers.length ? "No matching shops" : "No shops published yet"}

@@ -17,9 +17,11 @@ const SCORES = [
 export function FilterBar({
   butchers,
   resultCount,
+  inline = false,
 }: {
   butchers: ButcherSummary[];
   resultCount: number;
+  inline?: boolean;
 }) {
   const { filters, setFilter, resetFilters } = useMapStore();
 
@@ -32,7 +34,7 @@ export function FilterBar({
     filters.minScore || filters.specialty || filters.openNow || filters.q;
 
   return (
-    <div className="absolute top-3 left-3 right-3 z-10 sm:right-auto sm:w-[27rem]">
+    <div className={inline ? "relative z-10 m-3 shrink-0 sm:w-[27rem]" : "absolute top-3 left-3 right-3 z-10 sm:right-auto sm:w-[27rem]"}>
       <div className="rise-in rounded-2xl bg-surface/95 backdrop-blur-md shadow-xl border border-line overflow-hidden">
         {/* Brand strip */}
         <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2">
