@@ -111,7 +111,7 @@ export function MapExplorer({ butchers: initialButchers, unavailable = false }: 
       <FilterBar butchers={butchers} resultCount={visible.length} inline={flowLayout} />
       {!showList && butchers.length > 0 && <MapLegend />}
       {butchers.length > 0 && !mapFailed && process.env.NEXT_PUBLIC_MAPBOX_TOKEN && (
-        <button className="absolute bottom-5 left-3 z-10 rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold shadow-lg"
+        <button className="fixed bottom-5 right-16 z-10 rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold shadow-lg"
           onClick={() => {
             if (listView) {
               compactRef.current = TORONTO.zoom < TAG_ZOOM;
