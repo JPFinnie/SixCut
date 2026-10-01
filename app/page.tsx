@@ -4,8 +4,8 @@ import type { ButcherSummary } from "@/lib/types";
 
 export const revalidate = 300; // butcher list changes rarely
 
-async function getButchers(): Promise<ButcherSummary[]> {
-  if (!hasSupabaseEnv()) return []; // e.g. CI build without creds
+async function getButchers(): Promise<{ butchers: ButcherSummary[]; unavailable: boolean }> {
+  if (!hasSupabaseEnv()) return { butchers: [], unavailable: true };
   const db = supabaseServer();
   const { data, error } = await db
     .from("butchers")
@@ -15,14 +15,14 @@ async function getButchers(): Promise<ButcherSummary[]> {
     .eq("is_published", true)
     .order("six_cut_score", { ascending: false, nullsFirst: false });
   if (error) console.error("[home] butchers query:", error.message);
-  return (data ?? []) as ButcherSummary[];
+  return { butchers: (data ?? []) as ButcherSummary[], unavailable: Boolean(error) };
 }
 
 export default async function HomePage() {
-  const butchers = await getButchers();
+  const { butchers, unavailable } = await getButchers();
   return (
     <main className="flex flex-col flex-1 h-dvh">
-      <MapExplorer butchers={butchers} />
+      <MapExplorer butchers={butchers} unavailable={unavailable} />
     </main>
   );
 }

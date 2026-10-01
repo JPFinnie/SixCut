@@ -12,7 +12,7 @@ const SUMMARY_COLS =
  * client-side from `hours` to keep this response cacheable.)
  */
 export async function GET(req: NextRequest) {
-  if (!hasSupabaseEnv()) return NextResponse.json({ butchers: [] });
+  if (!hasSupabaseEnv()) return unavailable();
   const p = req.nextUrl.searchParams;
   const db = supabaseServer();
 
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
 
   if (error) {
     console.error("[/api/butchers]", error.message);
-    return NextResponse.json({ butchers: [] }, { status: 500 });
+    return unavailable();
   }
 
   return NextResponse.json(
@@ -52,5 +52,12 @@ export async function GET(req: NextRequest) {
         "Cache-Control": "s-maxage=300, stale-while-revalidate=3600",
       },
     },
+  );
+}
+
+function unavailable() {
+  return NextResponse.json(
+    { error: "The directory is temporarily unavailable. Please try again." },
+    { status: 503, headers: { "Cache-Control": "no-store", "Retry-After": "30" } },
   );
 }
